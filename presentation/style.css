@@ -1,0 +1,5 @@
+.red-box {
+    @apply border-red;
+    @apply border-3;
+    @apply rounded-5;
+}

@@ -11,6 +11,8 @@
     "@iconify-json/mdi": "^1.1.46",
     "@slidev/cli": "^0.40.3",
     "@slidev/theme-default": "^0.21.2",
-    "postcss": "^8.4.21"
+    "chart.js": "^4.3.0",
+    "postcss": "^8.4.21",
+    "vue-chartjs": "^5.2.0"
   }
 }
