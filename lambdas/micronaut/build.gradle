@@ -1,0 +1,76 @@
+/* Copyright (c) 2021, Factor 10 AB */
+
+plugins {
+    id("groovy") 
+    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("io.micronaut.application") version "3.7.9"
+}
+
+version = "0.1"
+group = "com.x10.lambda"
+
+repositories {
+    mavenCentral()
+}
+
+micronaut {
+    version = "3.9.1"
+    runtime("lambda")
+    testRuntime("spock2")
+    processing {
+        incremental(true)
+        annotations("com.x10.lambda.*")
+    }
+}
+
+dependencies {
+    implementation platform("software.amazon.awssdk:bom:2.17.34")
+
+    annotationProcessor("io.micronaut:micronaut-validation")
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-runtime")
+    implementation("javax.annotation:javax.annotation-api")
+    runtimeOnly("ch.qos.logback:logback-classic")
+    runtimeOnly("ch.qos.logback.contrib:logback-json-classic:0.1.5")
+    compileOnly("org.graalvm.nativeimage:svm")
+
+    implementation("io.micronaut:micronaut-validation")
+    implementation("io.micronaut.aws:micronaut-function-aws")
+    implementation("io.micronaut.aws:micronaut-function-aws-custom-runtime")
+    implementation("io.micronaut.aws:micronaut-aws-sdk-v2")
+    implementation("io.micronaut.crac:micronaut-crac")
+
+    implementation "com.google.guava:guava:30.1.1-jre"
+    implementation "software.amazon.awssdk:dynamodb", {
+        exclude group: "software.amazon.awssdk", module: "apache-client"
+        exclude group: "software.amazon.awssdk", module: "netty-nio-client"
+    }
+    implementation "software.amazon.awssdk:url-connection-client"
+
+    testImplementation("io.micronaut:micronaut-function")
+    testImplementation("io.micronaut.aws:micronaut-function-aws-test")
+}
+
+
+application {
+    mainClass.set("com.x10.lambda.UserLambdaRuntime")
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            javaLauncher.set(javaToolchains.launcherFor {
+                languageVersion.set(JavaLanguageVersion.of(19))
+            })
+        }
+    }
+}
+
+dockerfileNative {
+    args "-Dio.netty.allocator.numDirectArenas=0", "-Dio.netty.noPreferDirect=true"
+
+}
+
+tasks.named("assemble") {
+    dependsOn(":shadowJar")
+}

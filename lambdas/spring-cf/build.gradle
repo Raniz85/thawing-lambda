@@ -1,0 +1,69 @@
+/* Copyright (c) 2021, Factor 10 AB */
+
+plugins {
+    id "application"
+    id "groovy"
+    id "org.springframework.boot" version "3.1.0"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+}
+
+version = "0.1"
+group = "com.x10.bootlambda"
+
+if (!project.hasProperty("vmFunction")) {
+    logger.warn("vmFunction not set, deploying the VM lambda won't work. Configure in gradle.properties")
+    logger.warn("vmFunction=...")
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set("springCloudFunctionVersion", "3.2.10")
+}
+
+dependencies {
+
+    //implementation platform("org.springframework.boot:spring-boot-dependencies:3.1.0")
+    implementation platform("org.springframework.cloud:spring-cloud-function-dependencies:${springCloudFunctionVersion}")
+    implementation platform("software.amazon.awssdk:bom:2.20.68")
+
+    implementation "org.springframework.cloud:spring-cloud-function-adapter-aws"
+    implementation "org.springframework.cloud:spring-cloud-starter-function-webflux"
+    implementation "javax.validation:validation-api:2.0.1.Final"
+    compileOnly "com.amazonaws:aws-lambda-java-events:2.0.2"
+    compileOnly "com.amazonaws:aws-lambda-java-core:1.1.0"
+
+    //implementation "com.google.guava:guava:30.1.1-jre"
+    implementation "software.amazon.awssdk:dynamodb"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.spockframework:spock-core:2.0-groovy-3.0"
+}
+
+application {
+  mainClass = "com.x10.lambda.UserRequestHandler"
+}
+
+assemble.dependsOn = [shadowJar]
+
+import com.github.jengelman.gradle.plugins.shadow.transformers.*
+
+shadowJar {
+    archiveClassifier = "aws"
+    dependencies {
+        exclude(
+                dependency("org.springframework.cloud:spring-cloud-function-web:${springCloudFunctionVersion}"))
+    }
+
+    // Required for Spring
+    mergeServiceFiles()
+    append 'META-INF/spring.handlers'
+    append 'META-INF/spring.schemas'
+    append 'META-INF/spring.tooling'
+    transform(PropertiesFileTransformer) {
+        paths = ['META-INF/spring.factories']
+        mergeStrategy = "append"
+    }
+}
