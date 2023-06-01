@@ -9,14 +9,14 @@ export function resolveAssetUrl(url: string) {
   return url
 }
 
-export function handleBackground(background?: string, dim = false): CSSProperties {
+export function handleBackground(background?: string, dim = false, dark: boolean = null): CSSProperties {
   const isColor = background && ['#', 'rgb', 'hsl'].some(v => background.indexOf(v) === 0)
 
   const style = {
     background: isColor
       ? background
       : undefined,
-    color: (background && !isColor)
+    color: (background && (dark == true ? true : dim))
       ? 'white'
       : undefined,
     backgroundImage: isColor

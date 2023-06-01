@@ -9,12 +9,14 @@ const props = defineProps({
     // random image from a curated Unsplash collection by Anthony
     default: 'https://source.unsplash.com/collection/94734566/1920x1080',
   },
+  dark: {
+  },
   dim: {
     default: true,
   },
 })
 
-const style = computed(() => handleBackground(props.background, props.dim))
+const style = computed(() => handleBackground(props.background, props.dim, props.dark))
 const components = defineComponent({ Default })
 </script>
 
