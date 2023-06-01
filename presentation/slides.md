@@ -7,17 +7,6 @@ highlighter: shiki
 # show line numbers in code blocks
 lineNumbers: false
 
-# some information about the slides, markdown enabled
-info: |
-  ## Slidev Starter Template
-  Presentation slides for developers.
-
-  Learn more at [Sli.dev](https://sli.dev)
-
-# persist drawings in exports and build
-drawings:
-  persist: false
-
 # use UnoCSS
 css: unocss
 
@@ -85,7 +74,7 @@ dim: false
 <div class="ml-60px">
 
 # Thawing Java on AWS Lambda
-## Reducing cold start times from 6 seconds to .1
+## Reducing cold start times from 6 seconds to .2
 
 <div class="text-black">
 Daniel Raniz Raneland<br />
@@ -111,28 +100,32 @@ Coding Architect @ factor10
 
 <div class="relative w-full h-full"><v-clicks>
 
-  <div class="absolute top-50 left-10">
-  &gt;15 years in the industry
-  </div>
-  <div class="absolute top-75 left-25">
-  Masters degree from LTH
-  </div>
-  <div class="absolute top-100 left-150">
-  Sony Mobile Tokyo
-  </div>
-  <div class="absolute top-15 left-80">
-  Spiideo
-  </div>
-  <div class="absolute top-65 left-120">
-  Factor10
-  </div>
-  <div class="absolute top-30 left-120">
-  2 kids, 1 wife, 0 pets
-  </div>
-  <div class="absolute top-5 left-150">
-  Triathlete?
-  </div>
-
+<ul class="list-none!">
+  <li class="py-4">
+    <span class="inline-block text-center w-8 h-8 text-white text-110% mr-3 rounded-full bg-green">→</span>
+    Master of Science in Software Development from LTH, Faculty of Engineering.
+  </li>
+  <li class="py-4">
+    <span class="inline-block text-center w-8 h-8 text-white text-110% mr-3 rounded-full bg-green">→</span>
+    Master thesis: <em>Performance- and Cost-efficient Cloud Architectures</em>.
+  </li>
+  <li class="py-4">
+    <span class="inline-block text-center w-8 h-8 text-white text-110% mr-3 rounded-full bg-green">→</span>
+    Active triathlete.
+  </li>
+  <li class="py-4">
+    <span class="inline-block text-center w-8 h-8 text-white text-110% mr-3 rounded-full bg-green">→</span>
+    In the top 4% on Stack Overflow.
+  </li>
+  <li class="py-4">
+    <span class="inline-block text-center w-8 h-8 text-white text-110% mr-3 rounded-full bg-green">→</span>
+    Worked for Sony Mobile in Tokyo to improve in-house cloud capabilities.
+  </li>
+  <li class="py-4">
+    <span class="inline-block text-center w-8 h-8 text-white text-110% mr-3 rounded-full bg-green">→</span>
+    Beer brewer and sourdough bread baker.
+  </li>
+</ul>
 </v-clicks></div>
 
 ---
@@ -152,10 +145,20 @@ Logo from Wikimedia Commons, Apache License 2.0
 </Attribution>
 
 ---
-layout: center
----
 
-![Call Graph](/images/call-graph-warm.png)
+```mermaid
+sequenceDiagram
+  AWS Lambda->>+CloudFunction: handleRequest
+  CloudFunction->>+Context: getHandler
+  Context-->>-CloudFunction: return
+  CloudFunction->>+Handler: handle
+  Handler->>+UserRepository: save
+  UserRepository->>+DynamoDB: putItem
+  DynamoDB-->>-UserRepository: return
+  UserRepository->>-Handler: return
+  Handler->>-CloudFunction: return
+  deactivate CloudFunction
+```
 
 ---
 layout: center
@@ -163,7 +166,7 @@ layout: center
 
 <ScatterPlot dataFile="spring-warm.json" />
 
-<Arrow v-click class="text-red" x1="200" y1="90" x2="105" y2="103" />
+<Arrow v-click class="text-red" x1="200" y1="90" x2="135" y2="115" />
 
 <!--
 Outlier in the beginning of ~6.5 seconds, the rest are sub-50 ms
@@ -215,18 +218,40 @@ Worst case you're the first visitor and get hit by four cold starts
 -->
 
 ---
-layout: center
+
+```mermaid
+sequenceDiagram
+  AWS Lambda->>+CloudFunction: handleRequest
+  CloudFunction->>+Context: getHandler
+  Context-->>-CloudFunction: return
+  CloudFunction->>+Handler: handle
+  Handler->>+UserRepository: save
+  UserRepository->>+DynamoDB: putItem
+  DynamoDB-->>-UserRepository: return
+  UserRepository->>-Handler: return
+  Handler->>-CloudFunction: return
+  deactivate CloudFunction
+```
+
 ---
 
-![Call Graph](/images/call-graph-warm.png)
+```mermaid
+sequenceDiagram
+  AWS Lambda->>+CloudFunction: handleRequest
+  CloudFunction->>+Context: getHandler
+  Context->>Context: init
+  Context-->>-CloudFunction: return
+  CloudFunction->>+Handler: handle
+  Handler->>+UserRepository: save
+  UserRepository->>+DynamoDB: putItem
+  DynamoDB-->>-UserRepository: return
+  UserRepository->>-Handler: return
+  Handler->>-CloudFunction: return
+  deactivate CloudFunction
+```
 
----
-layout: center
----
 
-![Call Graph](/images/call-graph-cold.png)
-
-<div class="absolute top-180px left-320px w-90px h-110px border-red border-3 rounded-5"></div>
+<div class="absolute top-160px left-390px w-90px h-110px border-red border-3 rounded-5"></div>
 
 ---
 
@@ -234,11 +259,15 @@ layout: center
 
 1. Update lambda configuration
 2. Wait for lambda to be ready
-3. Run request
-4. Ensure that the log tail contains initialization time 
-    a. store if it does
-    b. discard if it does not
-5. Repeat until we have enough measurements
+3. Publish a new version
+4. Wait for the new version to be ready
+5. Run 30 simultaneous requests
+6. Collect all log tails:
+
+    a. Record if it contains _Init Duration_\
+    b. Discard if it does not
+
+7. Repeat until we have enough measurements
 
 ---
 
@@ -276,6 +305,11 @@ layout: center
 
 ![Micronaut logo](/images/micronaut-logo.png)
 
+
+<!--
+Initial release in 2018
+By Greame Rocher, author of Grails
+-->
 ---
 layout: statement
 ---
@@ -433,7 +467,7 @@ Micronaut, analyze at compile time
 
 ## On Publish
 
-- Start JVM, doing JIT and initialization
+- Start application, doing JIT and initialization
 - Take snapshot
 
 ## On "Cold Start"
@@ -443,6 +477,7 @@ Micronaut, analyze at compile time
 
 <!--
 Launched in 2022.
+Works with Java 11 and 17
 -->
 
 ---
@@ -452,10 +487,55 @@ Launched in 2022.
 <ScatterPlot dataFile="snap.json" />
 
 ---
+layout: statement
+---
 
-# Just in Time Compilation
+# Drawbacks
 
-![JIT Overview](/images/spring-micronaut-jit.png)
+---
+layout: center
+---
+
+# Need to dry-run everything
+
+```java
+@Override
+public void beforeCheckpoint(Context<? extends Resource> context) throws Exception {
+    try {
+        dynamoDbClient.listTables();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+```
+
+---
+layout: cover
+dim: false
+dark: true
+background: /images/retro-gadgets.jpg
+---
+
+# LTS Only
+
+<Attribution>
+Lorenzo Herrera via Unsplash
+</Attribution>
+
+---
+layout: cover
+dim: false
+dark: true
+background: /images/audi-ferrari-wec.jpg
+---
+
+<h1 v-click>Fast?</h1>
+
+---
+layout: statement
+---
+
+# Can we do even better?
 
 ---
 layout: center
@@ -474,13 +554,6 @@ struct User {
     name: String,
 }
 
-#[tokio::main]
-async fn main() -> Result<(), Error> {
-    let func = service_fn(func);
-    lambda_runtime::run(func).await?;
-    Ok(())
-}
-
 async fn func(event: LambdaEvent<CreateUser>) -> Result<User, Error> {
     let (user, _context) = event.into_parts();
     let config = aws_config::load_from_env().await;
@@ -490,6 +563,12 @@ async fn func(event: LambdaEvent<CreateUser>) -> Result<User, Error> {
     };
     let client = Client::new(&config);
     client.put_item()
+        .table_name(env::var("USER_TABLE_NAME").unwrap())
+        .item("id", AttributeValue::S(user.id.to_string()))
+        .item("name", AttributeValue::S(user.name.clone()))
+        .send().await?;
+    Ok(user)
+}
 ```
 
 ---
@@ -499,14 +578,52 @@ async fn func(event: LambdaEvent<CreateUser>) -> Result<User, Error> {
 <ScatterPlot dataFile="rust.json" />
 
 <!--
-Rust averages at around 80 ms
+Rust averages at around 40 ms
 -->
+
+---
+layout: statement
+---
+
+# Drawbacks
+
+---
+layout: cover
+background: /images/hieroglyphs.jpg
+dim: false
+dark: true
+---
+
+<Attribution>
+Isaac Chou via Unsplash 
+</Attribution>
+
+---
+layout: cover
+background: /images/infant.jpg
+dim: false
+---
+
+<Attribution>
+Jimmy Conover via Unsplash
+</Attribution>
+
+---
+layout: statement
+---
+
+# Wasn't This About Java?
 
 ---
 layout: center
 ---
 
 ![GraalVM logo](/images/graalvm-logo.png)
+
+<!--
+Originally intended to be self-hosting - i.e. write a JVM in Java.
+Nowadays a JDK distribution based on OpenJDK that also bundles the Graal compiler.
+-->
 
 ---
 layout: center
@@ -540,7 +657,7 @@ layout: center
 <ScatterPlot dataFile="micronaut-native.json" />
 
 <!--
-Micronaut Native averages at around 120 ms
+Micronaut Native averages at around 200 ms
 -->
 
 ---
@@ -559,6 +676,12 @@ layout: center
 Randal Munroe, https://xkcd.com/303 CC BY-NC 2.5
 </Attribution>
 
+<!--
+Compile times, my laptop:
+JVM: 1 s
+Graal: 2 m 22 s, on every build
+-->
+
 ---
 layout: cover
 dim: false
@@ -576,6 +699,22 @@ Tools that work with the JVM won’t work with native images. Debugging is done 
 ---
 layout: cover
 dim: false
+background: /images/wizard.jpg
+---
+
+<Attribution>
+Andrew Becraft, flickr.com/photos/dunechaser/ CC BY-NC-SA 2.0
+</Attribution>
+
+<!--
+Graal requires lots of configuration to work with reflection.
+Micronaut solves a lot of this,
+but Micronaut can't solve what it isn't aware of.
+-->
+
+---
+layout: cover
+dim: false
 background: /images/square-hole.jpg
 ---
 
@@ -587,6 +726,17 @@ Simon Greig, flickr.com/photos/xrrr/ CC BY-NC-SA 2.0
 Native binaries are not portable. Not really “Write Once Run Anywhere” anymore. Cross-compilation support is currently non-existent.
 The Micronaut plugin for Gradle uses Docker to build for AmazonLinux
 -->
+
+---
+
+# Honorable Mentions
+
+<v-clicks>
+
+- Quarkus
+- Spring Native
+
+</v-clicks>
 
 ---
 
