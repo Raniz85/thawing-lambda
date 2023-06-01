@@ -22,10 +22,16 @@ drawings:
 css: unocss
 
 layout: intro
+background: /images/devoxx-template.png
+dim: false
 ---
 
-# TDD Workshop
+<div class="ml-60px">
 
+# Thawing Java on AWS Lambda
+## Reducing cold start times from 11 seconds to 1
+
+<div class="text-black">
 Daniel Raniz Raneland<br />
 Coding Architect @ factor10
 
@@ -39,6 +45,64 @@ Coding Architect @ factor10
   <li><mdi-gitlab />raniz</li>
   <li>&nbsp;</li>
 </ul>
+</div>
+</div>
+
+---
+layout: intro
+background: /images/devoxx-template.png
+dim: false
+---
+
+<div class="ml-60px">
+
+# Thawing Java on AWS Lambda
+<h2 class="decoration-line-through">Reducing cold start times from 11 seconds to 1</h2>
+
+<div class="text-black">
+Daniel Raniz Raneland<br />
+Coding Architect @ factor10
+
+<ul class="list-none! columns-2">
+  <li><mdi-email />raniz@factor10.com</li>
+  <li><mdi-github />Raniz85</li>
+  <li><mdi-mastodon />raniz@mastodon.online</li>
+
+  <li><mdi-firefox />raniz.blog</li>
+  <li><mdi-linkedin />/in/raneland</li>
+  <li><mdi-gitlab />raniz</li>
+  <li>&nbsp;</li>
+</ul>
+</div>
+</div>
+
+---
+layout: intro
+background: /images/devoxx-template.png
+dim: false
+---
+
+<div class="ml-60px">
+
+# Thawing Java on AWS Lambda
+## Reducing cold start times from 6 seconds to .1
+
+<div class="text-black">
+Daniel Raniz Raneland<br />
+Coding Architect @ factor10
+
+<ul class="list-none! columns-2">
+  <li><mdi-email />raniz@factor10.com</li>
+  <li><mdi-github />Raniz85</li>
+  <li><mdi-mastodon />raniz@mastodon.online</li>
+
+  <li><mdi-firefox />raniz.blog</li>
+  <li><mdi-linkedin />/in/raneland</li>
+  <li><mdi-gitlab />raniz</li>
+  <li>&nbsp;</li>
+</ul>
+</div>
+</div>
 
 ---
 
@@ -235,4 +299,301 @@ Spring, analyze at startup
 <div v-click class="text-center">
 Micronaut, analyze at compile time
 <img src="/images/micronaut-runtime.png" />
+</div>
+
+---
+layout: two-cols
+---
+
+# Very similar to work with
+
+::left::
+
+## Spring
+
+```java
+@Component
+public class UserRequestHandler
+        implements Function<CreateUser, User> {
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Override
+    public User apply(@Validated CreateUser input) {
+```
+
+::right::
+
+## Micronaut
+
+```java
+@Introspected
+public class UserRequestHandler
+        extends MicronautRequestHandler<CreateUser, User> {
+
+    @Inject
+    private UserRepository userRepository;
+
+    @Override
+    public User execute(@Valid CreateUser input) {
+```
+
+---
+layout: two-cols
+---
+
+# Very similar to work with
+
+::left::
+
+## Spring
+
+```java
+@Component
+public class UserRepository {
+    private final DynamoDbClient dynamo;
+    private final String tableName;
+    
+    
+    public UserRepository(
+            DynamoDbClient dynamo,
+            @Value("${user.table-name}")
+            String tablename
+    ) {
+```
+
+::right::
+
+## Micronaut
+
+```java
+@Singleton
+public class UserRepository {
+    private final DynamoDbClient dynamo;
+    private final String tableName;
+
+    @Inject
+    public UserRepository(
+            DynamoDbClient dynamo,
+            @Property(name="user.table-name")
+            String tablename
+    ) {
+```
+
+---
+
+# Cold Start Benchmarks
+
+<ScatterPlot dataFile="micronaut.json" />
+
+---
+layout: statement
+---
+
+# What's the real problem?
+
+---
+
+# Compile Time vs Runtime
+
+<div class="text-center">
+Spring, analyze at startup
+<img src="/images/spring-runtime.png" />
+</div>
+
+<div class="text-center">
+Micronaut, analyze at compile time
+<img src="/images/micronaut-runtime.png" />
+</div>
+
+---
+
+# Compile Time vs Runtime
+
+<img class="top-50% translate-y-160px" src="/images/runtime-jit.png" />
+
+---
+
+# Just in Time Compilation
+
+<div>
+    <div class="text-center">Spring, JIT at startup, analyze at startup</div>
+    <img src="/images/spring-runtime-jit.png" />
+</div>
+
+<div class="py-8">
+    <div class="text-center">Micronaut, analyze at compile time, JIT at startup</div>
+    <img src="/images/micronaut-runtime-jit.png" />
+</div>
+
+---
+
+# Lambda SnapStart
+
+## On Publish
+
+- Start JVM, doing JIT and initialization
+- Take snapshot
+
+## On "Cold Start"
+
+- Restore snapshot
+- Call function
+
+<!--
+Launched in 2022.
+-->
+
+---
+
+# Cold Start Benchmarks
+
+<ScatterPlot dataFile="snap.json" />
+
+---
+
+# Just in Time Compilation
+
+![JIT Overview](/images/spring-micronaut-jit.png)
+
+---
+layout: center
+---
+
+<img src="/images/rust-logo-blk.svg" class="h-400px" />
+
+---
+
+# Rust looks very different from Java
+
+```rust
+#[derive(Serialize)]
+struct User {
+    id: Uuid,
+    name: String,
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Error> {
+    let func = service_fn(func);
+    lambda_runtime::run(func).await?;
+    Ok(())
+}
+
+async fn func(event: LambdaEvent<CreateUser>) -> Result<User, Error> {
+    let (user, _context) = event.into_parts();
+    let config = aws_config::load_from_env().await;
+    let user = User {
+        id: Uuid::new_v4(),
+        name: user.name
+    };
+    let client = Client::new(&config);
+    client.put_item()
+```
+
+---
+
+# Cold Start Benchmarks
+
+<ScatterPlot dataFile="rust.json" />
+
+<!--
+Rust averages at around 80 ms
+-->
+
+---
+layout: center
+---
+
+![GraalVM logo](/images/graalvm-logo.png)
+
+---
+layout: center
+---
+
+![GraalVM features](/images/graalvm-features.png)
+
+---
+
+# GraalVM vs JVM
+
+<div>
+    <div class="text-center">Spring, JIT at startup, analyze at startup</div>
+    <img src="/images/spring-runtime-jit.png" />
+</div>
+
+<div class="py-8">
+    <div class="text-center">Micronaut, analyze at compile time, JIT at startup</div>
+    <img src="/images/micronaut-runtime-jit.png" />
+</div>
+
+<div v-click>
+    <div class="text-center">"GraalVM, native compile ahead of time</div>
+    <img src="/images/graalvm-runtime.png" />
+</div>
+
+---
+
+# Cold Start Benchmarks
+
+<ScatterPlot dataFile="micronaut-native.json" />
+
+<!--
+Micronaut Native averages at around 120 ms
+-->
+
+---
+layout: statement
+---
+
+# Drawbacks
+
+---
+layout: center
+---
+
+![XKCD: Compiling](/images/compiling.png)
+
+<Attribution>
+Randal Munroe, https://xkcd.com/303 CC BY-NC 2.5
+</Attribution>
+
+---
+layout: cover
+dim: false
+background: /images/php-hammer.jpg
+---
+
+<Attribution>
+Ian Baker, flickr.com/photos/raindrift/ CC BY 2.0
+</Attribution>
+
+<!--
+Tools that work with the JVM won’t work with native images. Debugging is done with GDB - which isn’t supported by IDEA for example.
+-->
+
+---
+layout: cover
+dim: false
+background: /images/square-hole.jpg
+---
+
+<Attribution>
+Simon Greig, flickr.com/photos/xrrr/ CC BY-NC-SA 2.0
+</Attribution>
+
+<!--
+Native binaries are not portable. Not really “Write Once Run Anywhere” anymore. Cross-compilation support is currently non-existent.
+The Micronaut plugin for Gradle uses Docker to build for AmazonLinux
+-->
+
+---
+
+# Raniz' Flowchart for Thawing Your Lambdas
+
+<div class="mt-15">
+
+![Flowchart for deciding on how to fix your lambda](/images/flowchart.png)
+
 </div>
