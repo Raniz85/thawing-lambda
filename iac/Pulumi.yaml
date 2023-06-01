@@ -1,0 +1,3 @@
+name: thawing-lambda
+runtime: java
+description: Example lambdas for testing cold start times on AWS Lambda
