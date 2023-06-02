@@ -278,6 +278,7 @@ sequenceDiagram
 ---
 layout: cover
 dim: false
+dark: true
 background: /images/antifreeze.jpg
 ---
 
@@ -516,7 +517,11 @@ dark: true
 background: /images/retro-gadgets.jpg
 ---
 
+<v-clicks>
+
 # LTS Only
+
+</v-clicks>
 
 <Attribution>
 Lorenzo Herrera via Unsplash
@@ -529,13 +534,25 @@ dark: true
 background: /images/audi-ferrari-wec.jpg
 ---
 
-<h1 v-click>Fast?</h1>
+<v-clicks>
+
+# Could be Faster?
+
+</v-clicks>
+
+<!--
+
+Ferrari 488 GTE: 490 hp, 1260 kg
+
+Audio R18 e-tron quattro, 976 hp, 875 kg
+
+-->
 
 ---
 layout: statement
 ---
 
-# Can we do even better?
+# I Want The Audi!
 
 ---
 layout: center
@@ -746,4 +763,27 @@ The Micronaut plugin for Gradle uses Docker to build for AmazonLinux
 
 ![Flowchart for deciding on how to fix your lambda](/images/flowchart.png)
 
+</div>
+
+---
+layout: intro
+---
+
+# Thawing Java on AWS Lambda
+## Reducing cold start times from 6 seconds to .2
+
+<div class="text-black">
+Daniel Raniz Raneland<br />
+Coding Architect @ factor10
+
+<ul class="list-none! columns-2">
+  <li><mdi-email />raniz@factor10.com</li>
+  <li><mdi-github />Raniz85</li>
+  <li><mdi-mastodon />raniz@mastodon.online</li>
+
+  <li><mdi-firefox />raniz.blog</li>
+  <li><mdi-linkedin />/in/raneland</li>
+  <li><mdi-gitlab />raniz</li>
+  <li>&nbsp;</li>
+</ul>
 </div>
